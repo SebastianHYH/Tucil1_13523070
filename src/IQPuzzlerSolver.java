@@ -7,14 +7,44 @@ public class IQPuzzlerSolver {
     private static char[][] board;
     private static List<char[][]> pieces = new ArrayList<>();
     private static long iterations = 0;
-    
+    // COLORS //
+    private static final String[] COLORS = {
+        "\u001B[31m", // Red
+        "\u001B[32m", // Green
+        "\u001B[33m", // Yellow
+        "\u001B[34m", // Blue
+        "\u001B[35m", // Magenta
+        "\u001B[36m", // Cyan
+        "\u001B[38;5;208m", // Orange
+        "\u001B[38;5;214m", // Light Orange
+        "\u001B[38;5;165m", // Purple
+        "\u001B[38;5;200m", // Pink
+        "\u001B[38;5;118m", // Bright Lime Green
+        "\u001B[38;5;75m",  // Sky Blue
+        "\u001B[38;5;220m", // Gold
+        "\u001B[38;5;130m", // Brown
+        "\u001B[38;5;255m", // Light Gray
+        "\u001B[38;5;21m",  // Deep Blue
+        "\u001B[91m", // Bright Red
+        "\u001B[92m", // Bright Green
+        "\u001B[93m", // Bright Yellow
+        "\u001B[94m", // Bright Blue
+        "\u001B[95m", // Bright Magenta
+        "\u001B[96m", // Bright Cyan
+        "\u001B[90m", // Dark Gray
+        "\u001B[97m",  // White
+        "\u001B[38;5;196m", // Dark Red
+        "\u001B[38;5;46m",  // Dark Green
+    };
+    private static final String RESET = "\u001B[0m";
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter test case file path: ");
+        System.out.print("Masukkan path test case(.txt): ");
         String filePath = scanner.nextLine();
 
         if (!readInputFile(filePath)) {
-            System.out.println("Failed to read input file.");
+            System.out.println("Gagal membaca file test case.");
             return;
         }
         
@@ -36,15 +66,21 @@ public class IQPuzzlerSolver {
         if (solved) {
             printBoard();
         } else {
-            System.out.println("No solution found.");
+            System.out.println("Tidak ditemukan solusi.\n");
         }
         
-        System.out.println("Execution time: " + (endTime - startTime) + " ms");
-        System.out.println("Total iterations: " + iterations);
+        System.out.println("Waktu pencarian: " + (endTime - startTime) + " ms\n");
+        System.out.println("Banyak kasus yang ditinjau: " + iterations +"\n");
 
-        System.out.print("Save solution? (yes/no): ");
-        if (scanner.nextLine().equalsIgnoreCase("yes")) {
+        System.out.print("Apakah anda ingin menyimpan solusi sebagai txt? (ya/tidak): ");
+        if (scanner.nextLine().equalsIgnoreCase("ya")) {
             saveSolution(filePath + "_solution.txt");
+        }
+        System.out.print("Apakah anda ingin menyimpan solusi sebagai gambar? (ya/tidak): ");
+        if (scanner.nextLine().equalsIgnoreCase("ya")) {
+            System.out.print("Masukkan nama file: ");
+            String filename = scanner.nextLine();
+            SaveAsImage.main(board, rows, cols, filename);
         }
     }
     
@@ -65,10 +101,10 @@ public class IQPuzzlerSolver {
             
             String line;
             while ((line = br.readLine()) != null) {
-                line = line.stripTrailing(); // Remove only trailing spaces
-                if (line.isEmpty()) continue; // Skip empty lines but don’t reset parsing
+                line = line.stripTrailing(); // Remove trailing spaces
+                if (line.isEmpty()) continue; // Skip empty lines
                 
-                char firstChar = line.trim().charAt(0); // Detect first non-space character
+                char firstChar = line.trim().charAt(0); // Detect non-space character
                 if (currentLetter.isEmpty() || firstChar == currentLetter.charAt(0)) {
                     shapeLines.add(line);
                 } else {
@@ -133,8 +169,14 @@ public class IQPuzzlerSolver {
             for (int r = 0; r <= rows - transformedPiece.length; r++) {
                 for (int c = 0; c <= cols - transformedPiece[0].length; c++) {
                     if (canPlace(transformedPiece, r, c)) {
-                        System.out.println("Placing piece " + piece[0][0] + " at (" + r + ", " + c + ")");
-                        placePiece(transformedPiece, r, c, piece[0][0]);
+                        char shapeSymbol = piece[0][0];
+                        int symbolPicker = 1;
+                        while (shapeSymbol == ' ') {
+                            shapeSymbol = piece[0][symbolPicker];
+                            symbolPicker++;
+                        }
+                        System.out.println("Placing piece " + shapeSymbol + " at (" + r + ", " + c + ")");
+                        placePiece(transformedPiece, r, c, shapeSymbol);
                         iterations++;
                         printBoard();
                         System.out.println("Iteration: " + iterations);
@@ -172,8 +214,8 @@ public class IQPuzzlerSolver {
             System.arraycopy(matrix[i], 0, copy[i], 0, matrix[i].length);
         }
         return copy;
-    }
-    
+    } 
+    // Modify pieces
     private static char[][] rotate90(char[][] piece) {
         int h = piece.length, w = piece[0].length;
         char[][] rotated = new char[w][h];
@@ -196,7 +238,7 @@ public class IQPuzzlerSolver {
         return mirrored;
     }
     
-    private static boolean canPlace(char[][] piece, int r, int c) {
+    private static boolean canPlace(char[][] piece, int r, int c) { // Checker
         for (int i = 0; i < piece.length; i++) {
             for (int j = 0; j < piece[i].length; j++) {
                 if (piece[i][j] != ' ' && board[r + i][c + j] != '.') {
@@ -206,7 +248,7 @@ public class IQPuzzlerSolver {
         }
         return true;
     }
-    
+
     private static void placePiece(char[][] piece, int r, int c, char symbol) {
         for (int i = 0; i < piece.length; i++) {
             for (int j = 0; j < piece[i].length; j++) {
@@ -227,24 +269,34 @@ public class IQPuzzlerSolver {
         }
     }
     
-    private static void printBoard() {
+    private static void printBoard() { // Prints board
+        Map<Character, String> colorMap = new HashMap<>();
+        
+        for (char c = 'A'; c <= 'Z'; c++) {
+            colorMap.put(c, COLORS[(c - 'A') % COLORS.length]);
+        }
+        
         for (char[] row : board) {
             for (char cell : row) {
-                System.out.print(cell + " ");
+                if (cell == '.') {
+                    System.out.print(cell + " ");
+                } else {
+                    System.out.print(colorMap.get(cell) + cell + RESET + " ");
+                }
             }
             System.out.println();
         }
         System.out.println();
     }
     
-    private static void saveSolution(String outputPath) {
+    private static void saveSolution(String outputPath) { // Saving solution as txt file
         try (PrintWriter writer = new PrintWriter(outputPath)) {
             for (char[] row : board) {
                 writer.println(new String(row));
             }
-            System.out.println("Solution saved to " + outputPath);
+            System.out.println("File berhasil disimpan di " + outputPath);
         } catch (IOException e) {
-            System.out.println("Failed to save solution.");
+            System.out.println("Gagal menyimpan solusi.");
         }
     }
 }
