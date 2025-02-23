@@ -49,18 +49,6 @@ public class IQPuzzlerSolver {
             scanner.close();
             return;
         }
-        // PIECE DEBUGGING //
-        
-        // System.out.println("Pieces:");
-        // for (char[][] piece : pieces) {
-        //     printMatrix(piece);
-        //     System.out.println();
-        //     System.out.println("Transformasi:");
-        //     for (char[][] transformation : generateTransformations(piece)) {
-        //         printMatrix(transformation);
-        //         System.out.println();
-        //     }
-        // }
         
         long startTime = System.currentTimeMillis();
         boolean solved = solve(0);
@@ -78,7 +66,7 @@ public class IQPuzzlerSolver {
         if (solved) {
             System.out.print("Apakah anda ingin menyimpan solusi sebagai txt? (ya/tidak): ");
             if (scanner.nextLine().equalsIgnoreCase("ya")) {
-                saveSolution(filePath + "_solution.txt");
+                saveSolution(filePath + "_solution.txt", filePath);
             }
             System.out.print("Apakah anda ingin menyimpan solusi sebagai gambar? (ya/tidak): ");
             if (scanner.nextLine().equalsIgnoreCase("ya")) {
@@ -138,22 +126,9 @@ public class IQPuzzlerSolver {
             
             return piecesRead == pieceCount;
         } catch (Exception e) {
-            // e.printStackTrace();
-            // System.out.println("Gagal membaca file atau file tidak ada.\n");
             return false;
         }
     }
-    
-    // For printing each piece (DEBUGGING)
-    // private static void printMatrix(char[][] matrix) {
-    //     for (char[] row : matrix) {
-    //         for (char cell : row) {
-    //             System.out.print(cell == ' ' ? '.' : cell);
-    //             System.out.print(" ");
-    //         }
-    //         System.out.println();
-    //     }
-    // }
 
     private static char[][] convertToMatrix(List<String> shapeLines, char letter) {
         int h = shapeLines.size();
@@ -175,7 +150,6 @@ public class IQPuzzlerSolver {
     
     private static boolean solve(int pieceIndex) {
         if (pieceIndex >= pieces.size()) return true;
-        // System.out.println("Mencoba piece: " + pieceIndex); // DEBUGGING
         
         char[][] piece = pieces.get(pieceIndex);
         List<char[][]> transformations = generateTransformations(piece);
@@ -190,15 +164,9 @@ public class IQPuzzlerSolver {
                             shapeSymbol = piece[0][symbolPicker]; // e.g: .A
                             symbolPicker++;                       //      AA
                         }                                         // where dot = empty space
-                        // System.out.println("Place " + shapeSymbol + " at (" + r + ", " + c + ")"); DEBUGGING
                         placePiece(transformedPiece, r, c, shapeSymbol);
-                        iterations++;
-                        // printBoard(); // DEBUGGING
-                        // System.out.println("Iterasi: " + iterations); //DEBUGGING
-                        
+                        iterations++;                        
                         if (solve(pieceIndex + 1)) return true;
-                        
-                        // System.out.println("Remove " + piece[0][0] + " from (" + r + ", " + c + ")"); // DEBUGGING
                         removePiece(transformedPiece, r, c);
                     }
                 }
@@ -308,10 +276,12 @@ public class IQPuzzlerSolver {
         System.out.println();
     }
 
-    private static void saveSolution(String outputPath) { // File .txt
-        File solutionsDir = new File("solutions");
+    private static void saveSolution(String outputPath, String testCasePath) { // File .txt
+        File testCaseDir = new File(testCasePath).getParentFile(); // Get test case directory
+        File solutionsDir = new File(testCaseDir, "solutions"); // Create 'solutions' inside that directory
+    
         if (!solutionsDir.exists()) {
-            solutionsDir.mkdir(); // Membuat folder 'solutions' jika belum ada
+            solutionsDir.mkdir(); // Create folder if it doesn't exist
         }
         
         File outputFile = new File(solutionsDir, new File(outputPath).getName());
@@ -320,7 +290,7 @@ public class IQPuzzlerSolver {
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols; j++) {
                     char cell = board[i][j];
-                    writer.print(cell == '.' ? " " : cell); // Mengubah bentuk . ke spasi untuk board custom
+                    writer.print(cell == '.' ? " " : cell); // Convert '.' to space for better formatting
                     writer.print(" ");
                 }
                 writer.println();
