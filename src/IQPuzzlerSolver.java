@@ -149,7 +149,17 @@ public class IQPuzzlerSolver {
     }
     
     private static boolean solve(int pieceIndex) {
-        if (pieceIndex >= pieces.size()) return true;
+        if (pieceIndex >= pieces.size()) {
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    if (maskBoard[i][j] == 'X' && board[i][j] == '.') {
+                        return false;
+                    } 
+                }
+            }
+            return true;
+        }
+
         
         char[][] piece = pieces.get(pieceIndex);
         List<char[][]> transformations = generateTransformations(piece);
