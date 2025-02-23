@@ -3,7 +3,7 @@
 Program ini dinamakan IQ Puzzler Solver, sebuah program yang dapat menyelesaikan tantangan-tantangan dari permainan IQ Puzzler Pro. Solusi yang diberikan program dapat disimpan sebagai file teks ataupun file gambar
 
 ## Requirements
-- Java and its libraries
+- Latest version of Java and its libraries
 
 ## How to Run
 1. Clone repository menggunakan
