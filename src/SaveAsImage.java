@@ -76,14 +76,12 @@ public class SaveAsImage {
         graphics.dispose();
 
         try {
-            // Get test case directory and create images folder
             File testCaseDir = new File(testCasePath).getParentFile();
             File imagesDir = new File(testCaseDir, "images");
             if (!imagesDir.exists()) {
                 imagesDir.mkdir();
             }
 
-            // Save the image inside the images folder
             File outputFile = new File(imagesDir, filename + ".png");
             ImageIO.write(image, "png", outputFile);
             System.out.println("Gambar berhasil disimpan di " + outputFile.getAbsolutePath());
