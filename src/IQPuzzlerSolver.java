@@ -277,8 +277,8 @@ public class IQPuzzlerSolver {
     }
 
     private static void saveSolution(String outputPath, String testCasePath) { // File .txt
-        File testCaseDir = new File(testCasePath).getParentFile(); // Get test case directory
-        File solutionsDir = new File(testCaseDir, "solutions"); // Create 'solutions' inside that directory
+        File testCaseDir = new File(testCasePath).getParentFile();
+        File solutionsDir = new File(testCaseDir, "solutions");
     
         if (!solutionsDir.exists()) {
             solutionsDir.mkdir(); // Create folder if it doesn't exist
@@ -290,7 +290,7 @@ public class IQPuzzlerSolver {
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols; j++) {
                     char cell = board[i][j];
-                    writer.print(cell == '.' ? " " : cell); // Convert '.' to space for better formatting
+                    writer.print(cell == '.' ? " " : cell);
                     writer.print(" ");
                 }
                 writer.println();
