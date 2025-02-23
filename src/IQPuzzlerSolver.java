@@ -86,7 +86,7 @@ public class IQPuzzlerSolver {
             pieceCount = Integer.parseInt(dimensions[2]);
             maskBoard = new char[rows][cols];
             board = new char[rows][cols];
-            String boardType = br.readLine(); // DEFAULT, CUSTOM, PYRAMID
+            String boardType = br.readLine(); // DEFAULT, CUSTOM
             if (boardType.equals("DEFAULT")) {
                 for (char[] row : maskBoard) Arrays.fill(row, 'X');
             } else if (boardType.equals("CUSTOM")) {
