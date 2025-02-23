@@ -75,15 +75,17 @@ public class IQPuzzlerSolver {
         System.out.println("Waktu pencarian: " + (endTime - startTime) + " ms\n");
         System.out.println("Banyak kasus yang ditinjau: " + iterations +"\n");
 
-        System.out.print("Apakah anda ingin menyimpan solusi sebagai txt? (ya/tidak): ");
-        if (scanner.nextLine().equalsIgnoreCase("ya")) {
-            saveSolution(filePath + "_solution.txt");
-        }
-        System.out.print("Apakah anda ingin menyimpan solusi sebagai gambar? (ya/tidak): ");
-        if (scanner.nextLine().equalsIgnoreCase("ya")) {
-            System.out.print("Masukkan nama file: ");
-            String filename = scanner.nextLine();
-            SaveAsImage.main(board, rows, cols, filename);
+        if (solved) {
+            System.out.print("Apakah anda ingin menyimpan solusi sebagai txt? (ya/tidak): ");
+            if (scanner.nextLine().equalsIgnoreCase("ya")) {
+                saveSolution(filePath + "_solution.txt");
+            }
+            System.out.print("Apakah anda ingin menyimpan solusi sebagai gambar? (ya/tidak): ");
+            if (scanner.nextLine().equalsIgnoreCase("ya")) {
+                System.out.print("Masukkan nama file: ");
+                String filename = scanner.nextLine();
+                SaveAsImage.main(board, rows, cols, filePath, filename);
+            }
         }
         scanner.close();
     }
@@ -307,7 +309,14 @@ public class IQPuzzlerSolver {
     }
 
     private static void saveSolution(String outputPath) { // File .txt
-        try (PrintWriter writer = new PrintWriter(outputPath)) {
+        File solutionsDir = new File("solutions");
+        if (!solutionsDir.exists()) {
+            solutionsDir.mkdir(); // Membuat folder 'solutions' jika belum ada
+        }
+        
+        File outputFile = new File(solutionsDir, new File(outputPath).getName());
+        
+        try (PrintWriter writer = new PrintWriter(outputFile)) {
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols; j++) {
                     char cell = board[i][j];
@@ -316,7 +325,7 @@ public class IQPuzzlerSolver {
                 }
                 writer.println();
             }
-            System.out.println("File berhasil disimpan di " + outputPath);
+            System.out.println("File berhasil disimpan di " + outputFile.getAbsolutePath());
         } catch (IOException e) {
             System.out.println("Gagal menyimpan solusi.");
         }

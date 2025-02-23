@@ -36,7 +36,7 @@ public class SaveAsImage {
         new Color(0,102,0)// Color.DARK_GREEN,
     };
 
-    public static void main(char[][] board, int rows, int cols, String filename) {
+    public static void main(char[][] board, int rows, int cols, String testCasePath, String filename) {
         int tileSize = 50;
         int width = cols * tileSize;
         int height = rows * tileSize;
@@ -75,9 +75,18 @@ public class SaveAsImage {
 
         graphics.dispose();
 
-        try{
-            ImageIO.write(image, "png", new File(filename+".png"));
-            System.out.println("Gambar berhasil disimpan dengan nama " + filename + ".png");
+        try {
+            // Get test case directory and create images folder
+            File testCaseDir = new File(testCasePath).getParentFile();
+            File imagesDir = new File(testCaseDir, "images");
+            if (!imagesDir.exists()) {
+                imagesDir.mkdir();
+            }
+
+            // Save the image inside the images folder
+            File outputFile = new File(imagesDir, filename + ".png");
+            ImageIO.write(image, "png", outputFile);
+            System.out.println("Gambar berhasil disimpan di " + outputFile.getAbsolutePath());
         } catch (IOException e) {
             System.out.println("Gagal menyimpan gambar");
         }
